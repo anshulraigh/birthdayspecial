@@ -1,293 +1,958 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Anshul Rai - 3D carousel</title>
-</head>
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-  }
-  
-  html,
-  body {
-    height: 100%;
-    /* for touch screen */
-    touch-action: none; 
-  }
-  
-  body {
-    overflow: hidden;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    background: #111;
-    -webkit-perspective: 1000px;
-            perspective: 1000px;
-    -webkit-transform-style: preserve-3d;
-            transform-style: preserve-3d;
-  }
-  
-  #drag-container, #spin-container {
-    position: relative;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    margin: auto;
-    -webkit-transform-style: preserve-3d;
-            transform-style: preserve-3d;
-    -webkit-transform: rotateX(-10deg);
-            transform: rotateX(-10deg);
-  }
-  
-  #drag-container img, #drag-container video {
-    -webkit-transform-style: preserve-3d;
-            transform-style: preserve-3d;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    line-height: 200px;
-    font-size: 50px;
-    text-align: center;
-    -webkit-box-shadow: 0 0 8px #fff;
-            box-shadow: 0 0 8px #fff;
-    -webkit-box-reflect: below 10px linear-gradient(transparent, transparent, #0005);
-  }
-  
-  #drag-container img:hover, #drag-container video:hover {
-    -webkit-box-shadow: 0 0 15px #fffd;
-            box-shadow: 0 0 15px #fffd;
-    -webkit-box-reflect: below 10px linear-gradient(transparent, transparent, #0007);
-  }
-  
-  #drag-container p {
-    font-family: Serif;
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    -webkit-transform: translate(-50%,-50%) rotateX(90deg);
-            transform: translate(-50%,-50%) rotateX(90deg);
-    color: #fff;
-  }
-  
-  #ground {
-    width: 900px;
-    height: 900px;
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    -webkit-transform: translate(-50%,-50%) rotateX(90deg);
-            transform: translate(-50%,-50%) rotateX(90deg);
-    background: -webkit-radial-gradient(center center, farthest-side , #9993, transparent);
-  }
-  
-  #music-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-  
-  @-webkit-keyframes spin {
-    from{
-      -webkit-transform: rotateY(0deg);
-              transform: rotateY(0deg);
-    } to{
-      -webkit-transform: rotateY(360deg);
-              transform: rotateY(360deg);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meenu — Love Carousel</title>
+  <style>
+    :root {
+      --bg-1: #120918;
+      --bg-2: #2b0d36;
+      --panel: rgba(19, 12, 25, 0.68);
+      --panel-strong: rgba(36, 22, 46, 0.9);
+      --line: rgba(255,255,255,0.14);
+      --text: #f9e9ff;
+      --muted: #ffbfd9;
+      --pink: #ff7db6;
+      --rose: #ff4fa3;
+      --lavender: #d7b4ff;
+      --gold: #ffd66e;
+      --shadow: rgba(255, 108, 175, 0.42);
+      --glow: rgba(255, 157, 214, 0.55);
     }
-  }
-  
-  @keyframes spin {
-    from{
-      -webkit-transform: rotateY(0deg);
-              transform: rotateY(0deg);
-    } to{
-      -webkit-transform: rotateY(360deg);
-              transform: rotateY(360deg);
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-  }
-  @-webkit-keyframes spinRevert {
-    from{
-      -webkit-transform: rotateY(360deg);
-              transform: rotateY(360deg);
-    } to{
-      -webkit-transform: rotateY(0deg);
-              transform: rotateY(0deg);
+
+    html, body {
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top, rgba(255, 110, 180, 0.25), transparent 35%),
+        radial-gradient(circle at bottom, rgba(163, 114, 255, 0.22), transparent 40%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2));
+      color: var(--text);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
     }
-  }
-  @keyframes spinRevert {
-    from{
-      -webkit-transform: rotateY(360deg);
-              transform: rotateY(360deg);
-    } to{
-      -webkit-transform: rotateY(0deg);
-              transform: rotateY(0deg);
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px 52px;
+      perspective: 1300px;
+      touch-action: pan-y;
+      cursor: default;
     }
-  }
-</style>
-<body>
-<!-- partial:index.partial.html -->
-<div id="drag-container">
-  <div id="spin-container">
-    <img src="images/image.jpeg" alt="">
-    <img src="images/image1.jpeg" alt="">
-    <img src="images/image2.jpeg" alt="">
-    <img src="images/image3.jpeg" alt="">
-    <img src="images/image4.jpeg" alt="">
-    <img src="images/image5.jpeg" alt="">
-    <img src="images/image6.jpeg" alt="">
-    <img src="images/image7.jpeg" alt="">
-    <img src="images/image8.jpeg" alt="">
-    <img src="images/image9.jpeg" alt="">
-    <img src="images/image10.jpeg" alt="">
 
-    <!-- Example image with link -->
-    <!-- <a target="_blank" href="https://images.pexels.com/photos/139829/pexels-photo-139829.jpeg">
-      <img src="https://images.pexels.com/photos/139829/pexels-photo-139829.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="">
-    </a> -->
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.7;
+      z-index: 0;
+      pointer-events: none;
+    }
 
-    <!-- Example add video 
-    <video controls autoplay="autoplay" loop>
-      <source src="https://player.vimeo.com/external/322244668.sd.mp4?s=338c48ac2dfcb1d4c0689968b5baf94eee6ca0c1&profile_id=165&oauth2_token_id=57447761" type="video/mp4">
-    </video> -->
+    body::before {
+      width: 300px;
+      height: 300px;
+      top: 8%;
+      left: 10%;
+      background: rgba(255, 109, 180, 0.35);
+    }
 
-    <!-- Text at center of ground -->
-    <p>Happy Birthday Meenu❤️☘️
-       -From Your Loving One💖</p>
-  </div>
-  <div id="ground"></div>
-</div>
+    body::after {
+      width: 330px;
+      height: 330px;
+      right: 10%;
+      bottom: 8%;
+      background: rgba(176, 112, 255, 0.28);
+    }
 
-<!-- <div id="music-container"></div> -->
+    .app-shell {
+      position: relative;
+      width: min(1200px, 100%);
+      min-height: 860px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
 
+    .top-panel {
+      width: min(980px, 100%);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 22px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: rgba(14, 9, 17, 0.42);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 20px 50px rgba(27, 14, 27, 0.25);
+      margin-bottom: 18px;
+      transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+    }
 
+    body.original-mode .top-panel {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(-12px);
+      height: 0;
+      min-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-bottom: 0;
+      overflow: hidden;
+      border-width: 0;
+    }
 
-<!-- github corner (https://github.com/tholman/github-corners) -->
-<style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
-<!-- partial -->
-  <script >
-    var radius = 240; // how big of the radius
-var autoRotate = true; // auto rotate or not
-var rotateSpeed = -60; // unit: seconds/360 degrees
-var imgWidth = 120; // width of images (unit: px)
-var imgHeight = 170; // height of images (unit: px)
+    body.original-mode .showcase {
+      margin-top: 0;
+    }
 
-// Link of background music - set 'null' if you dont want to play background music
-var bgMusicURL = 'https://api.soundcloud.com/tracks/143041228/stream?client_id=587aa2d384f7333a886010d5f52f302a';
-var bgMusicControls = true; // Show UI music control
+    .title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
+    .tiny-label {
+      color: var(--gold);
+      font-size: 0.72rem;
+      letter-spacing: 0.25rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
 
+    h1 {
+      font-size: clamp(1.8rem, 2.5vw, 3rem);
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      text-shadow: 0 0 18px rgba(255, 152, 206, 0.5);
+    }
 
-// ===================== start =======================
-// animation start after 1000 miliseconds
-setTimeout(init, 1000);
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
 
-var odrag = document.getElementById('drag-container');
-var ospin = document.getElementById('spin-container');
-var aImg = ospin.getElementsByTagName('img');
-var aVid = ospin.getElementsByTagName('video');
-var aEle = [...aImg, ...aVid]; // combine 2 arrays
+    .setting {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
 
-// Size of images
-ospin.style.width = imgWidth + "px";
-ospin.style.height = imgHeight + "px";
+    select, button, .upload-btn {
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      font: inherit;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
 
-// Size of ground - depend on radius
-var ground = document.getElementById('ground');
-ground.style.width = radius * 3 + "px";
-ground.style.height = radius * 3 + "px";
+    select {
+      appearance: none;
+      padding: 10px 14px;
+      cursor: pointer;
+      background-image: linear-gradient(45deg, transparent 50%, #fff 50%), linear-gradient(135deg, #fff 50%, transparent 50%);
+      background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 32px;
+    }
 
-function init(delayTime) {
-  for (var i = 0; i < aEle.length; i++) {
-    aEle[i].style.transform = "rotateY(" + (i * (360 / aEle.length)) + "deg) translateZ(" + radius + "px)";
-    aEle[i].style.transition = "transform 1s";
-    aEle[i].style.transitionDelay = delayTime || (aEle.length - i) / 4 + "s";
-  }
-}
+    button, .upload-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 18px;
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: 0 12px 24px rgba(255, 121, 189, 0.12);
+    }
 
-function applyTranform(obj) {
-  // Constrain the angle of camera (between 0 and 180)
-  if(tY > 180) tY = 180;
-  if(tY < 0) tY = 0;
+    button:hover, .upload-btn:hover, select:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 28px rgba(255, 121, 189, 0.18);
+    }
 
-  // Apply the angle
-  obj.style.transform = "rotateX(" + (-tY) + "deg) rotateY(" + (tX) + "deg)";
-}
+    .primary {
+      background: linear-gradient(135deg, var(--rose), #ff7a9a);
+      border-color: rgba(255,255,255,0.15);
+      color: white;
+    }
 
-function playSpin(yes) {
-  ospin.style.animationPlayState = (yes?'running':'paused');
-}
+    .upload-btn {
+      position: relative;
+      padding: 11px 18px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.04);
+    }
 
-var sX, sY, nX, nY, desX = 0,
-    desY = 0,
-    tX = 0,
-    tY = 10;
+    .upload-btn input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
 
-// auto spin
-if (autoRotate) {
-  var animationName = (rotateSpeed > 0 ? 'spin' : 'spinRevert');
-  ospin.style.animation = `${animationName} ${Math.abs(rotateSpeed)}s infinite linear`;
-}
+    .showcase {
+      width: min(100%, 1100px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+    }
 
-// // add background music
-// if (bgMusicURL) {
-//   document.getElementById('music-container').innerHTML += `
-// <audio src="${bgMusicURL}" ${bgMusicControls? 'controls': ''} autoplay loop>    
-// <p>If you are reading this, it is because your browser does not support the audio element.</p>
-// </audio>
-// `;
-// }
+    .scene-wrap {
+      position: relative;
+      width: min(860px, 90vw);
+      height: min(780px, 72vh);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 32px;
+      background: radial-gradient(circle at center, rgba(245, 170, 210, 0.06), rgba(255,255,255,0.02) 50%, transparent 75%);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: inset 0 0 60px rgba(255,255,255,0.04), 0 30px 80px rgba(0,0,0,0.28);
+    }
 
-// setup events
-document.onpointerdown = function (e) {
-  clearInterval(odrag.timer);
-  e = e || window.event;
-  var sX = e.clientX,
-      sY = e.clientY;
+    #drag-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+      transform: rotateX(-8deg) rotateY(0deg);
+      will-change: transform;
+      user-select: none;
+      touch-action: pan-y;
+    }
 
-  this.onpointermove = function (e) {
-    e = e || window.event;
-    var nX = e.clientX,
-        nY = e.clientY;
-    desX = nX - sX;
-    desY = nY - sY;
-    tX += desX * 0.1;
-    tY += desY * 0.1;
-    applyTranform(odrag);
-    sX = nX;
-    sY = nY;
-  };
+    #spin-container {
+      position: relative;
+      width: 180px;
+      height: 250px;
+      transform-style: preserve-3d;
+      animation: spin 28s linear infinite;
+    }
 
-  this.onpointerup = function (e) {
-    odrag.timer = setInterval(function () {
-      desX *= 0.95;
-      desY *= 0.95;
-      tX += desX * 0.1;
-      tY += desY * 0.1;
-      applyTranform(odrag);
-      playSpin(false);
-      if (Math.abs(desX) < 0.5 && Math.abs(desY) < 0.5) {
-        clearInterval(odrag.timer);
-        playSpin(true);
+    #spin-container img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 22px;
+      border: 2px solid rgba(255,255,255,0.45);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.33), 0 0 18px rgba(255, 255, 255, 0.28);
+      -webkit-box-reflect: below 12px linear-gradient(transparent, transparent, rgba(0,0,0,0.55));
+      transition: transform 1s ease, box-shadow 0.3s ease, filter 0.35s ease;
+      background: rgba(220,188,255,0.12);
+    }
+
+    #spin-container img:hover {
+      box-shadow: 0 18px 40px rgba(255, 160, 208, 0.35), 0 0 20px rgba(255,255,255,0.42);
+      filter: saturate(1.15) brightness(1.06);
+    }
+
+    #ground {
+      position: absolute;
+      left: 50%;
+      top: 74%;
+      width: 900px;
+      height: 900px;
+      transform: translate(-50%,-50%) rotateX(90deg);
+      background: radial-gradient(circle, rgba(255, 159, 208, 0.32), rgba(190, 126, 255, 0.15) 28%, rgba(0,0,0,0) 68%);
+      border-radius: 50%;
+      filter: blur(26px);
+      pointer-events: none;
+    }
+
+    .message {
+      position: absolute;
+      left: 50%;
+      top: 72%;
+      transform: translate(-50%, -50%) rotateX(90deg);
+      text-align: center;
+      width: min(90%, 650px);
+      background: rgba(8, 5, 11, 0.2);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 14px 20px 12px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.2);
+      color: white;
+      white-space: normal;
+    }
+
+    .message p {
+      font-size: clamp(1rem, 1.6vw, 1.6rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fff3f9;
+      text-shadow: 0 0 14px rgba(255, 157, 200, 0.7);
+    }
+
+    .message span {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.85rem;
+      color: var(--gold);
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .status {
+      position: absolute;
+      right: 16px;
+      bottom: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #84ffb7, #3dd4a5);
+      box-shadow: 0 0 10px rgba(95, 255, 170, 0.8);
+    }
+
+    @keyframes spin {
+      from { transform: rotateY(0deg); }
+      to { transform: rotateY(360deg); }
+    }
+
+    @keyframes spinRevert {
+      from { transform: rotateY(360deg); }
+      to { transform: rotateY(0deg); }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 20px 12px 36px;
       }
-    }, 17);
-    this.onpointermove = this.onpointerup = null;
-  };
 
-  return false;
-};
+      .top-panel {
+        padding: 16px 14px;
+        justify-content: center;
+      }
 
-document.onmousewheel = function(e) {
-  e = e || window.event;
-  var d = e.wheelDelta / 20 || -e.detail;
-  radius += d;
-  init(1);
-};
+      .controls {
+        width: 100%;
+        justify-content: stretch;
+      }
 
+      .setting, .upload-btn, button, select {
+        width: 100%;
+      }
+
+      .scene-wrap {
+        height: 70vh;
+      }
+
+      #drag-container {
+        min-height: 420px;
+      }
+
+      .message {
+        bottom: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="top-panel">
+      <div class="title-group">
+        <span class="tiny-label">For Meenu</span>
+        <h1>Forever in bloom</h1>
+      </div>
+
+      <div class="controls">
+        <label class="setting" for="photoCount">
+          <span>Carousel size</span>
+          <select id="photoCount" aria-label="Choose number of photos">
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12" selected>12</option>
+          </select>
+        </label>
+
+        <label class="setting" for="themeSelect">
+          <span>Style</span>
+          <select id="themeSelect" aria-label="Choose carousel style">
+            <option value="rose" selected>Rose Glow</option>
+            <option value="aurora">Aurora</option>
+            <option value="midnight">Midnight</option>
+          </select>
+        </label>
+
+        <label class="setting" for="messageInput">
+          <span>Floor text</span>
+          <input id="messageInput" type="text" value="Happy Birthday Meenu ❤️" aria-label="Edit floor text" />
+        </label>
+
+        <label class="setting" for="signatureInput">
+          <span>Signature</span>
+          <input id="signatureInput" type="text" value="From your loving one" aria-label="Edit signature" />
+        </label>
+
+        <label class="upload-btn">
+          <span>Choose photos</span>
+          <input id="photoUpload" type="file" accept="image/*" multiple />
+        </label>
+
+        <button id="resetBtn" type="button">Default gallery</button>
+        <button id="videoBtn" class="primary" type="button">Download cinematic video</button>
+        <button id="recordBtn" type="button">Record screen</button>
+      </div>
+    </header>
+
+    <main class="showcase">
+      <div class="scene-wrap">
+        <div id="drag-container" aria-label="3D love carousel">
+          <div id="spin-container"></div>
+          <div id="ground"></div>
+        </div>
+
+        <div class="message">
+          <p>Happy Birthday Meenu ❤️</p>
+          <span>From your loving one</span>
+        </div>
+
+        <div class="status"><span class="status-dot"></span><span id="statusText">Default memories</span></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const defaultBaseImages = [
+      'images/image.jpeg',
+      'images/image1.jpeg',
+      'images/image2.jpeg',
+      'images/image3.jpeg',
+      'images/image4.jpeg',
+      'images/image5.jpeg',
+      'images/image6.jpeg',
+      'images/image7.jpeg',
+      'images/image8.jpeg',
+      'images/image9.jpeg',
+      'images/image10.jpeg',
+      'images/image11.jpeg',
+      'images/image12.jpeg',
+      'images/image13.jpeg',
+      'images/image14.jpeg',
+      'images/image15.jpeg',
+      'images/image16.jpeg',
+      'images/image17.jpeg',
+      'images/image18.jpeg',
+      'images/image19.jpeg',
+      'images/image20.jpeg',
+      'images/image21.jpeg',
+      'images/image22.jpeg'
+    ];
+
+    const STORAGE_KEY = 'meenu-carousel-session-cache';
+    const carousel = {
+      radius: 250,
+      autoRotate: true,
+      rotateSpeed: -48,
+      imgWidth: 170,
+      imgHeight: 245,
+      activeCount: 6,
+      images: [...defaultBaseImages]
+    };
+
+    const dragContainer = document.getElementById('drag-container');
+    const spinContainer = document.getElementById('spin-container');
+    const ground = document.getElementById('ground');
+    const photoCountSelect = document.getElementById('photoCount');
+    const themeSelect = document.getElementById('themeSelect');
+    const messageInput = document.getElementById('messageInput');
+    const signatureInput = document.getElementById('signatureInput');
+    const photoUpload = document.getElementById('photoUpload');
+    const resetBtn = document.getElementById('resetBtn');
+    const videoBtn = document.getElementById('videoBtn');
+    const recordBtn = document.getElementById('recordBtn');
+    const statusText = document.getElementById('statusText');
+
+    const state = {
+      userImages: [],
+      tX: 0,
+      tY: 10,
+      desX: 0,
+      desY: 0,
+      sX: 0,
+      sY: 0
+    };
+
+    function loadSessionCache() {
+      try {
+        const cached = sessionStorage.getItem(STORAGE_KEY);
+        if (!cached) return [];
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length) {
+          return parsed.filter(Boolean);
+        }
+      } catch (error) {
+        console.warn('Session cache read failed:', error);
+      }
+      return [];
+    }
+
+    function saveSessionCache() {
+      try {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state.userImages));
+      } catch (error) {
+        console.warn('Session cache write failed:', error);
+      }
+    }
+
+    function getVisibleImages() {
+      const combined = [...defaultBaseImages, ...state.userImages];
+      return combined.slice(0, carousel.activeCount);
+    }
+
+    function setCarouselCount(count) {
+      carousel.activeCount = Math.max(4, Math.min(22, Number(count) || 12));
+      photoCountSelect.value = String(carousel.activeCount);
+      renderCarousel();
+    }
+
+    function buildCarousel() {
+      spinContainer.innerHTML = '';
+      const images = getVisibleImages();
+      images.forEach((src, index) => {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = `Photo ${index + 1}`;
+        img.loading = 'eager';
+        spinContainer.appendChild(img);
+      });
+
+      const allElements = [...spinContainer.children];
+      const total = allElements.length || 1;
+      const angle = 360 / total;
+      const radius = carousel.radius;
+
+      allElements.forEach((el, i) => {
+        el.style.transform = `rotateY(${i * angle}deg) translateZ(${radius}px)`;
+        el.style.transition = 'transform 1s ease';
+        el.style.transitionDelay = `${(total - i) * 0.06}s`;
+      });
+
+      const animationName = carousel.rotateSpeed > 0 ? 'spin' : 'spinRevert';
+      spinContainer.style.animation = `${animationName} ${Math.abs(carousel.rotateSpeed)}s infinite linear`;
+      spinContainer.style.width = `${carousel.imgWidth}px`;
+      spinContainer.style.height = `${carousel.imgHeight}px`;
+      ground.style.width = `${carousel.radius * 3}px`;
+      ground.style.height = `${carousel.radius * 3}px`;
+    }
+
+    function renderCarousel() {
+      buildCarousel();
+      updateStatus();
+    }
+
+    function updateStatus() {
+      if (state.userImages.length) {
+        statusText.textContent = `${state.userImages.length} custom photos cached`; 
+      } else {
+        statusText.textContent = 'Default memories';
+      }
+    }
+
+    function updateMessageDisplay() {
+      const mainText = (messageInput.value || 'Happy Birthday Meenu ❤️').trim() || 'Happy Birthday Meenu ❤️';
+      const signatureText = (signatureInput.value || 'From your loving one').trim() || 'From your loving one';
+      const main = document.querySelector('.message p');
+      const sub = document.querySelector('.message span');
+      main.textContent = mainText;
+      sub.textContent = signatureText;
+    }
+
+    function applyTransform() {
+      if (state.tY > 180) state.tY = 180;
+      if (state.tY < -180) state.tY = -180;
+      dragContainer.style.transform = `rotateX(${-state.tY}deg) rotateY(${state.tX}deg)`;
+    }
+
+    function playSpin(yes) {
+      spinContainer.style.animationPlayState = yes ? 'running' : 'paused';
+    }
+
+    function handlePointerDown(event) {
+      clearInterval(dragContainer.timer);
+      state.sX = event.clientX;
+      state.sY = event.clientY;
+
+      const moveHandler = (moveEvent) => {
+        const deltaX = moveEvent.clientX - state.sX;
+        const deltaY = moveEvent.clientY - state.sY;
+        state.sX = moveEvent.clientX;
+        state.sY = moveEvent.clientY;
+        state.desX = deltaX;
+        state.desY = deltaY;
+        state.tX += deltaX * 0.18;
+        state.tY += deltaY * 0.18;
+        applyTransform();
+      };
+
+      const upHandler = () => {
+        dragContainer.timer = setInterval(() => {
+          state.desX *= 0.92;
+          state.desY *= 0.92;
+          state.tX += state.desX * 0.12;
+          state.tY += state.desY * 0.12;
+          applyTransform();
+          playSpin(false);
+          if (Math.abs(state.desX) < 0.7 && Math.abs(state.desY) < 0.7) {
+            clearInterval(dragContainer.timer);
+            playSpin(true);
+          }
+        }, 17);
+
+        document.removeEventListener('pointermove', moveHandler);
+        document.removeEventListener('pointerup', upHandler);
+      };
+
+      document.addEventListener('pointermove', moveHandler);
+      document.addEventListener('pointerup', upHandler);
+    }
+
+    async function handleFileSelection(event) {
+      const files = Array.from(event.target.files || []);
+      if (!files.length) return;
+
+      const maxAllowed = Number(photoCountSelect.value || 6);
+      const selectedFiles = files.slice(0, maxAllowed);
+      const dataUrls = await Promise.all(selectedFiles.map(fileToDataUrl));
+
+      state.userImages = dataUrls.filter(Boolean);
+      saveSessionCache();
+      renderCarousel();
+      event.target.value = '';
+    }
+
+    function resetGallery() {
+      state.userImages = [];
+      sessionStorage.removeItem(STORAGE_KEY);
+      renderCarousel();
+    }
+
+    function applyTheme(mode) {
+      const themes = {
+        rose: {
+          '--bg-1': '#120918',
+          '--bg-2': '#2b0d36',
+          '--panel': 'rgba(19, 12, 25, 0.68)',
+          '--panel-strong': 'rgba(36, 22, 46, 0.9)',
+          '--line': 'rgba(255,255,255,0.14)',
+          '--text': '#f9e9ff',
+          '--muted': '#ffbfd9',
+          '--pink': '#ff7db6',
+          '--rose': '#ff4fa3',
+          '--lavender': '#d7b4ff',
+          '--gold': '#ffd66e',
+          '--shadow': 'rgba(255, 108, 175, 0.42)',
+          '--glow': 'rgba(255, 157, 214, 0.55)'
+        },
+        aurora: {
+          '--bg-1': '#0d1b24',
+          '--bg-2': '#122d2f',
+          '--panel': 'rgba(11, 23, 27, 0.66)',
+          '--panel-strong': 'rgba(18, 38, 42, 0.9)',
+          '--line': 'rgba(170,255,236,0.16)',
+          '--text': '#ecfff9',
+          '--muted': '#b4ffe5',
+          '--pink': '#70e0ff',
+          '--rose': '#85ffd9',
+          '--lavender': '#a2f5ff',
+          '--gold': '#ffe7a6',
+          '--shadow': 'rgba(91, 233, 194, 0.34)',
+          '--glow': 'rgba(132, 255, 227, 0.4)'
+        },
+        midnight: {
+          '--bg-1': '#090b17',
+          '--bg-2': '#1d1d37',
+          '--panel': 'rgba(13, 15, 28, 0.7)',
+          '--panel-strong': 'rgba(19, 22, 34, 0.92)',
+          '--line': 'rgba(180, 195, 255, 0.12)',
+          '--text': '#eef1ff',
+          '--muted': '#c4d0ff',
+          '--pink': '#7f9cff',
+          '--rose': '#b38cff',
+          '--lavender': '#b9c7ff',
+          '--gold': '#f7d66c',
+          '--shadow': 'rgba(117, 132, 255, 0.32)',
+          '--glow': 'rgba(136, 148, 255, 0.35)'
+        }
+      };
+
+      const selected = themes[mode] || themes.rose;
+      Object.entries(selected).forEach(([property, value]) => {
+        document.documentElement.style.setProperty(property, value);
+      });
+    }
+
+    function loadFromCache() {
+      state.userImages = loadSessionCache();
+      renderCarousel();
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function getSourceImages() {
+      const images = getVisibleImages();
+      const defaultImages = defaultBaseImages.slice(0, Math.max(4, Math.min(22, carousel.activeCount)));
+      return images.length ? images : defaultImages;
+    }
+
+    async function loadCarouselImages() {
+      const sources = getSourceImages();
+      const loaded = [];
+
+      for (const src of sources) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = src;
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+        loaded.push(img);
+      }
+
+      return loaded;
+    }
+
+    function drawCarouselFrame(ctx, frame, totalFrames, images, renderText, renderSignature) {
+      const time = frame / totalFrames;
+      const centerX = ctx.canvas.width / 2;
+      const centerY = ctx.canvas.height / 2 + 30;
+
+      const gradient = ctx.createRadialGradient(centerX, centerY, 40, centerX, centerY, 650);
+      gradient.addColorStop(0, 'rgba(255,216,238,0.22)');
+      gradient.addColorStop(0.35, 'rgba(155,92,255,0.18)');
+      gradient.addColorStop(1, 'rgba(12,8,20,0.92)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+      for (let i = 0; i < 54; i++) {
+        const x = (i * 70 + frame * 2.5) % (ctx.canvas.width + 90) - 45;
+        const y = (i * 51 + frame * 1.8) % (ctx.canvas.height + 70) - 35;
+        ctx.beginPath();
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(255,186,216,0.34)' : 'rgba(188,173,255,0.28)';
+        ctx.arc(x, y, 3 + (i % 5), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      const cardCount = images.length || 1;
+      const rotation = (frame / totalFrames) * Math.PI * 2 * 1.5;
+
+      for (let i = 0; i < cardCount; i++) {
+        const angle = (i / cardCount) * Math.PI * 2 + rotation;
+        const radius = 220 + Math.sin(frame * 0.08 + i) * 18;
+        const x = centerX + Math.cos(angle) * radius;
+        const y = centerY + Math.sin(angle) * radius * 0.45;
+        const scale = 0.72 + (Math.sin(angle * 2 + frame * 0.06) + 1) * 0.18;
+        const img = images[i % images.length];
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(Math.sin(frame * 0.09 + i) * 0.4);
+        ctx.scale(scale, scale);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.10)';
+        ctx.strokeStyle = 'rgba(255,255,255,0.32)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(-90, -120, 180, 240, 22);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.roundRect(-82, -112, 164, 224, 18);
+        ctx.clip();
+        ctx.drawImage(img, -82, -112, 164, 224);
+        ctx.restore();
+      }
+
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.textAlign = 'center';
+      ctx.font = '700 42px Segoe UI';
+      ctx.fillText(renderText, centerX, ctx.canvas.height - 48);
+
+      ctx.fillStyle = 'rgba(255, 214, 110, 0.95)';
+      ctx.font = '600 24px Segoe UI';
+      ctx.fillText(renderSignature, centerX, ctx.canvas.height - 12);
+
+      const floorGlow = ctx.createRadialGradient(centerX, ctx.canvas.height - 20, 60, centerX, ctx.canvas.height - 20, 330);
+      floorGlow.addColorStop(0, 'rgba(255,155,213,0.55)');
+      floorGlow.addColorStop(0.35, 'rgba(168,115,255,0.28)');
+      floorGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = floorGlow;
+      ctx.fillRect(0, ctx.canvas.height - 210, ctx.canvas.width, 220);
+    }
+
+    async function exportVideo() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1280;
+      canvas.height = 720;
+      const ctx = canvas.getContext('2d');
+      const renderText = (messageInput.value || 'Happy Birthday Meenu ❤️').trim() || 'Happy Birthday Meenu ❤️';
+      const renderSignature = (signatureInput.value || 'From your loving one').trim() || 'From your loving one';
+      const images = await loadCarouselImages();
+      const stream = canvas.captureStream(30);
+      const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+        ? 'video/webm;codecs=vp9'
+        : 'video/webm';
+      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 7_000_000 });
+      const chunks = [];
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunks.push(event.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'meenu-carousel-video.webm';
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      recorder.start();
+      const totalFrames = 210;
+      for (let frame = 0; frame < totalFrames; frame++) {
+        drawCarouselFrame(ctx, frame, totalFrames, images, renderText, renderSignature);
+        await new Promise(resolve => requestAnimationFrame(resolve));
+      }
+      recorder.stop();
+    }
+
+    async function recordScreen() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+        alert('This browser does not support screen recording.');
+        return;
+      }
+
+      try {
+        statusText.textContent = 'Recording...';
+        const displayStream = await navigator.mediaDevices.getDisplayMedia({
+          video: { frameRate: 30 },
+          audio: false
+        });
+
+        const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+          ? 'video/webm;codecs=vp9'
+          : 'video/webm';
+
+        const recorder = new MediaRecorder(displayStream, { mimeType, videoBitsPerSecond: 6_000_000 });
+        const chunks = [];
+
+        recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) chunks.push(event.data);
+        };
+
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: mimeType });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'meenu-carousel-screen-recording.webm';
+          a.click();
+          URL.revokeObjectURL(url);
+          statusText.textContent = state.userImages.length ? `${state.userImages.length} custom photos cached` : 'Default memories';
+        };
+
+        const stopAfter = 12000;
+        recorder.start();
+        setTimeout(() => recorder.stop(), stopAfter);
+        displayStream.getVideoTracks().forEach(track => {
+          track.addEventListener('ended', () => recorder.stop());
+        });
+      } catch (error) {
+        console.error('Screen recording failed:', error);
+        statusText.textContent = 'Recording cancelled';
+      }
+    }
+
+    photoCountSelect.addEventListener('change', (event) => {
+      setCarouselCount(event.target.value);
+    });
+
+    themeSelect.addEventListener('change', (event) => {
+      applyTheme(event.target.value);
+    });
+
+    messageInput.addEventListener('input', updateMessageDisplay);
+    signatureInput.addEventListener('input', updateMessageDisplay);
+
+    photoUpload.addEventListener('change', handleFileSelection);
+    resetBtn.addEventListener('click', resetGallery);
+    videoBtn.addEventListener('click', exportVideo);
+    recordBtn.addEventListener('click', recordScreen);
+    dragContainer.addEventListener('pointerdown', handlePointerDown);
+
+    updateMessageDisplay();
+    applyTheme('rose');
+    loadFromCache();
+    setCarouselCount(photoCountSelect.value);
   </script>
-
 </body>
+</html>
 
