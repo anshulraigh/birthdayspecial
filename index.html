@@ -447,8 +447,6 @@
         </label>
 
         <button id="resetBtn" type="button">Default gallery</button>
-        <button id="videoBtn" class="primary" type="button">Download cinematic video</button>
-        <button id="recordBtn" type="button">Record screen</button>
       </div>
     </header>
 
@@ -516,8 +514,6 @@
     const signatureInput = document.getElementById('signatureInput');
     const photoUpload = document.getElementById('photoUpload');
     const resetBtn = document.getElementById('resetBtn');
-    const videoBtn = document.getElementById('videoBtn');
-    const recordBtn = document.getElementById('recordBtn');
     const statusText = document.getElementById('statusText');
 
     const state = {
@@ -846,91 +842,6 @@
       ctx.fillRect(0, ctx.canvas.height - 210, ctx.canvas.width, 220);
     }
 
-    async function exportVideo() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 1280;
-      canvas.height = 720;
-      const ctx = canvas.getContext('2d');
-      const renderText = (messageInput.value || 'Happy Birthday Meenu ❤️').trim() || 'Happy Birthday Meenu ❤️';
-      const renderSignature = (signatureInput.value || 'From your loving one').trim() || 'From your loving one';
-      const images = await loadCarouselImages();
-      const stream = canvas.captureStream(30);
-      const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-        ? 'video/webm;codecs=vp9'
-        : 'video/webm';
-      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 7_000_000 });
-      const chunks = [];
-
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) chunks.push(event.data);
-      };
-
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'meenu-carousel-video.webm';
-        a.click();
-        URL.revokeObjectURL(url);
-      };
-
-      recorder.start();
-      const totalFrames = 210;
-      for (let frame = 0; frame < totalFrames; frame++) {
-        drawCarouselFrame(ctx, frame, totalFrames, images, renderText, renderSignature);
-        await new Promise(resolve => requestAnimationFrame(resolve));
-      }
-      recorder.stop();
-    }
-
-    async function recordScreen() {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-        alert('This browser does not support screen recording.');
-        return;
-      }
-
-      try {
-        statusText.textContent = 'Recording...';
-        const displayStream = await navigator.mediaDevices.getDisplayMedia({
-          video: { frameRate: 30 },
-          audio: false
-        });
-
-        const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-          ? 'video/webm;codecs=vp9'
-          : 'video/webm';
-
-        const recorder = new MediaRecorder(displayStream, { mimeType, videoBitsPerSecond: 6_000_000 });
-        const chunks = [];
-
-        recorder.ondataavailable = (event) => {
-          if (event.data.size > 0) chunks.push(event.data);
-        };
-
-        recorder.onstop = () => {
-          const blob = new Blob(chunks, { type: mimeType });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'meenu-carousel-screen-recording.webm';
-          a.click();
-          URL.revokeObjectURL(url);
-          statusText.textContent = state.userImages.length ? `${state.userImages.length} custom photos cached` : 'Default memories';
-        };
-
-        const stopAfter = 12000;
-        recorder.start();
-        setTimeout(() => recorder.stop(), stopAfter);
-        displayStream.getVideoTracks().forEach(track => {
-          track.addEventListener('ended', () => recorder.stop());
-        });
-      } catch (error) {
-        console.error('Screen recording failed:', error);
-        statusText.textContent = 'Recording cancelled';
-      }
-    }
-
     photoCountSelect.addEventListener('change', (event) => {
       setCarouselCount(event.target.value);
     });
@@ -944,8 +855,6 @@
 
     photoUpload.addEventListener('change', handleFileSelection);
     resetBtn.addEventListener('click', resetGallery);
-    videoBtn.addEventListener('click', exportVideo);
-    recordBtn.addEventListener('click', recordScreen);
     dragContainer.addEventListener('pointerdown', handlePointerDown);
 
     updateMessageDisplay();
