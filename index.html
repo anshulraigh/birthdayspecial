@@ -104,22 +104,62 @@
       transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
     }
 
-    body.original-mode .top-panel {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transform: translateY(-12px);
-      height: 0;
-      min-height: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-      margin-bottom: 0;
-      overflow: hidden;
-      border-width: 0;
+    body.fullscreen-mode .top-panel {
+      display: none;
     }
 
-    body.original-mode .showcase {
-      margin-top: 0;
+    body.fullscreen-mode .app-shell {
+      width: 100%;
+      min-height: 100vh;
+      justify-content: center;
+      padding: 0;
+    }
+
+    body.fullscreen-mode .showcase {
+      width: 100%;
+      flex: 1;
+      margin: 0;
+    }
+
+    body.fullscreen-mode .scene-wrap {
+      width: min(100vw, 100%);
+      height: 100vh;
+      max-height: 100vh;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+      background: radial-gradient(circle at center, rgba(255, 160, 208, 0.1), rgba(7, 4, 11, 0.96) 68%);
+    }
+
+    body.fullscreen-mode .message,
+    body.fullscreen-mode .status {
+      display: none;
+    }
+
+    body:fullscreen .top-panel,
+    body:fullscreen .message,
+    body:fullscreen .status {
+      display: none !important;
+    }
+
+    body:fullscreen .showcase {
+      width: 100%;
+      flex: 1;
+      margin: 0;
+    }
+
+    body:fullscreen .scene-wrap {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+      background: radial-gradient(circle at center, rgba(255, 160, 208, 0.1), rgba(7, 4, 11, 0.96) 68%);
+    }
+
+    body.fullscreen-mode::before,
+    body.fullscreen-mode::after {
+      display: none;
     }
 
     .title-group {
@@ -242,11 +282,17 @@
       transition: all 0.3s ease;
     }
 
-    body.recording-mode .top-panel {
+    body:fullscreen .top-panel {
       display: none;
     }
 
-    body.recording-mode .scene-wrap {
+    body:fullscreen .showcase {
+      width: 100%;
+      flex: 1;
+      margin: 0;
+    }
+
+    body:fullscreen .scene-wrap {
       position: fixed;
       inset: 0;
       width: 100vw;
@@ -463,7 +509,7 @@
           <input id="photoUpload" type="file" accept="image/*" multiple />
         </label>
 
-        <button id="recordBtn" type="button">Record screen</button>
+        <button id="fullScreenBtn" type="button">Go Full Screen</button>
       </div>
     </header>
 
@@ -530,7 +576,7 @@
     const messageInput = document.getElementById('messageInput');
     const signatureInput = document.getElementById('signatureInput');
     const photoUpload = document.getElementById('photoUpload');
-    const recordBtn = document.getElementById('recordBtn');
+    const fullScreenBtn = document.getElementById('fullScreenBtn');
     const statusText = document.getElementById('statusText');
 
     const state = {
@@ -689,10 +735,6 @@
       saveSessionCache();
       renderCarousel();
       event.target.value = '';
-    }
-
-    function setRecordingMode(isRecording) {
-      document.body.classList.toggle('recording-mode', isRecording);
     }
 
     function applyTheme(mode) {
@@ -857,57 +899,57 @@
       ctx.fillRect(0, ctx.canvas.height - 210, ctx.canvas.width, 220);
     }
 
-    async function recordScreen() {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-        alert('Screen recording is not supported in this browser.');
-        return;
+    function requestBrowserFullscreen(element) {
+      if (element.requestFullscreen) {
+        return element.requestFullscreen({ navigationUI: 'hide' });
       }
+      if (element.webkitRequestFullscreen) {
+        return element.webkitRequestFullscreen();
+      }
+      if (element.mozRequestFullScreen) {
+        return element.mozRequestFullScreen();
+      }
+      if (element.msRequestFullscreen) {
+        return element.msRequestFullscreen();
+      }
+      return Promise.reject(new Error('Fullscreen API not supported'));
+    }
 
+    async function toggleFullScreen() {
       try {
-        setRecordingMode(true);
-        statusText.textContent = 'Recording...';
-        const displayStream = await navigator.mediaDevices.getDisplayMedia({
-          video: { frameRate: 30 },
-          audio: false,
-          preferCurrentTab: true
-        });
+        const fullscreenTarget = document.documentElement || document.body;
 
-        const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-          ? 'video/webm;codecs=vp9'
-          : 'video/webm';
+        if (!document.fullscreenElement) {
+          await requestBrowserFullscreen(fullscreenTarget);
+          statusText.textContent = 'Full screen mode active';
+          return;
+        }
 
-        const recorder = new MediaRecorder(displayStream, { mimeType, videoBitsPerSecond: 6_000_000 });
-        const chunks = [];
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          await document.webkitExitFullscreen();
+        }
 
-        recorder.ondataavailable = (event) => {
-          if (event.data.size > 0) chunks.push(event.data);
-        };
-
-        recorder.onstop = () => {
-          const blob = new Blob(chunks, { type: mimeType });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'meenu-carousel-recording.webm';
-          a.click();
-          URL.revokeObjectURL(url);
-          displayStream.getTracks().forEach(track => track.stop());
-          setRecordingMode(false);
-          statusText.textContent = state.userImages.length ? `${state.userImages.length} custom photos cached` : 'Default memories';
-        };
-
-        recorder.start();
-        const stopAfter = 12000;
-        setTimeout(() => recorder.stop(), stopAfter);
-        displayStream.getVideoTracks().forEach(track => {
-          track.addEventListener('ended', () => recorder.stop());
-        });
+        statusText.textContent = state.userImages.length ? `${state.userImages.length} custom photos cached` : 'Default memories';
       } catch (error) {
-        console.error('Screen recording failed:', error);
-        setRecordingMode(false);
-        statusText.textContent = 'Recording cancelled';
+        console.error('Fullscreen toggle failed:', error);
+        statusText.textContent = 'Full screen blocked';
       }
     }
+
+    function syncFullscreenState() {
+      const isFullscreen = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+      document.body.classList.toggle('fullscreen-mode', isFullscreen);
+
+      if (!isFullscreen) {
+        statusText.textContent = state.userImages.length ? `${state.userImages.length} custom photos cached` : 'Default memories';
+      } else {
+        statusText.textContent = 'Full screen ready';
+      }
+    }
+
+    document.addEventListener('fullscreenchange', syncFullscreenState);
 
     photoCountSelect.addEventListener('change', (event) => {
       setCarouselCount(event.target.value);
@@ -921,13 +963,14 @@
     signatureInput.addEventListener('input', updateMessageDisplay);
 
     photoUpload.addEventListener('change', handleFileSelection);
-    recordBtn.addEventListener('click', recordScreen);
+    fullScreenBtn.addEventListener('click', toggleFullScreen);
     dragContainer.addEventListener('pointerdown', handlePointerDown);
 
     updateMessageDisplay();
     applyTheme('rose');
     loadFromCache();
     setCarouselCount(photoCountSelect.value);
+    syncFullscreenState();
   </script>
 </body>
 </html>
