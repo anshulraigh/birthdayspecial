@@ -463,7 +463,6 @@
           <input id="photoUpload" type="file" accept="image/*" multiple />
         </label>
 
-        <button id="resetBtn" type="button">Default gallery</button>
         <button id="recordBtn" type="button">Record screen</button>
       </div>
     </header>
@@ -531,7 +530,6 @@
     const messageInput = document.getElementById('messageInput');
     const signatureInput = document.getElementById('signatureInput');
     const photoUpload = document.getElementById('photoUpload');
-    const resetBtn = document.getElementById('resetBtn');
     const recordBtn = document.getElementById('recordBtn');
     const statusText = document.getElementById('statusText');
 
@@ -691,12 +689,6 @@
       saveSessionCache();
       renderCarousel();
       event.target.value = '';
-    }
-
-    function resetGallery() {
-      state.userImages = [];
-      sessionStorage.removeItem(STORAGE_KEY);
-      renderCarousel();
     }
 
     function setRecordingMode(isRecording) {
@@ -929,7 +921,6 @@
     signatureInput.addEventListener('input', updateMessageDisplay);
 
     photoUpload.addEventListener('change', handleFileSelection);
-    resetBtn.addEventListener('click', resetGallery);
     recordBtn.addEventListener('click', recordScreen);
     dragContainer.addEventListener('pointerdown', handlePointerDown);
 
