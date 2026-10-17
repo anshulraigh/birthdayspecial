@@ -582,12 +582,15 @@
     const state = {
       userImages: [],
       tX: 0,
-      tY: 10,
+      tY: 12,
       desX: 0,
       desY: 0,
       sX: 0,
       sY: 0
     };
+
+    const MAX_TILT_Y = 70;
+    const MIN_TILT_Y = -70;
 
     function loadSessionCache() {
       try {
@@ -675,8 +678,8 @@
     }
 
     function applyTransform() {
-      if (state.tY > 180) state.tY = 180;
-      if (state.tY < -180) state.tY = -180;
+      state.tY = Math.min(MAX_TILT_Y, Math.max(MIN_TILT_Y, state.tY));
+      state.tX = ((state.tX + 180) % 360 + 360) % 360 - 180;
       dragContainer.style.transform = `rotateX(${-state.tY}deg) rotateY(${state.tX}deg)`;
     }
 
@@ -694,10 +697,10 @@
         const deltaY = moveEvent.clientY - state.sY;
         state.sX = moveEvent.clientX;
         state.sY = moveEvent.clientY;
-        state.desX = deltaX;
-        state.desY = deltaY;
+        state.desX = deltaX * 0.45;
+        state.desY = deltaY * 0.45;
         state.tX += deltaX * 0.18;
-        state.tY += deltaY * 0.18;
+        state.tY += deltaY * 0.16;
         applyTransform();
       };
 
